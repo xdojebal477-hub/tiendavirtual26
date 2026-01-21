@@ -8,7 +8,11 @@ class ListadoProductos(ListView):
     model=Producto
     template_name='tienda/productos_lista.html'
     context_object_name='productos'
-    
+
+class ProductoDetalle(DetailView):
+    model=Producto
+    template_name='tienda/producto_detalle.html'
+    context_object_name='producto'
 class EditarProducto(UpdateView):
     model=Producto
     form_class=ProductoForm

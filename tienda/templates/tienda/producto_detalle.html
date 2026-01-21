@@ -1,0 +1,50 @@
+{% extends 'tienda/base.html' %}
+
+{% block contenido %}
+<div class="container mt-5">
+    <div class="card shadow-lg">
+        <div class="row g-0">
+            <div class="col-md-5 bg-light d-flex align-items-center justify-content-center">
+                {% if producto.foto %}
+                    <img src="{{ producto.foto.url }}" class="img-fluid rounded-start" alt="{{ producto.nombre }}" style="max-height: 400px; object-fit: contain;">
+                {% else %}
+                    <div class="text-muted p-5 text-center">
+                        <span style="font-size: 4rem;">📷</span>
+                        <p>no imagen</p>
+                    </div>
+                {% endif %}
+            </div>
+            
+            <!-- info producto -->
+            <div class="col-md-7">
+                <div class="card-body p-4">
+                    <div class="d-flex justify-content-between align-items-start mb-3">
+                        <span class="badge bg-secondary fs-6">{{ producto.marca.nombre }}</span>
+                        {% if producto.vip %}
+                            <span class="badge bg-warning text-dark">⭐ Producto VIP</span>
+                        {% endif %}
+                    </div>
+                    <h1 class="card-title fw-bold mb-3">{{ producto.nombre }}</h1>
+                    <h2 class="text-primary fw-bold mb-4">{{ producto.precio }} €</h2>
+                    <div class="mb-4">
+                        <p><strong>Unidades:</strong>
+                            {% if producto.unidades > 0 %}
+                                <span class="text-success">{{ producto.unidades }} unidades</span>
+                            {% else %}
+                                <span class="text-danger">sin unidades</span>
+                            {% endif %}
+                        </p>
+                    </div>
+                    <div class="d-grid gap-2 d-md-flex justify-content-md-start">
+                        
+                        {% if user.is_staff %}
+                            <a href="{% url 'producto_editar' producto.pk %}" class="btn btn-outline-warning">✏️ Editar</a>
+                        {% endif %}
+                        <a href="{% url 'listado' %}" class="btn btn-outline-secondary">⬅ Volver al listado</a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
