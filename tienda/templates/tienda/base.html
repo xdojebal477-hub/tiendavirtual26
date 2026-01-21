@@ -4,31 +4,36 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
     <title>{% block title %}Tienda Virtual{% endblock %}</title>
 </head>
 <body>
-    <nav>
-        <ul>
-            <li><a href="{% url 'compra-list' %}">Tienda</a></li>
-            {% if user.is_staff %}
-                <li><a href="{% url 'producto-list' %}">Admin Productos</a></li>
-                <li><a href="{% url 'informes-menu' %}">Informes</a></li>
-            {% endif %}
+    <nav class="navbar navbar-expand-lg navbar-light bg-light">
+        <div class="container-fluid">
+            <ul class="navbar-nav me-auto mb-2 mb-lg-0">
+                <li class="nav-item"><a class="nav-link" href="{% url 'listado' %}">Admin Productos</a></li>
+                {% if user.is_staff %}
+                    
+                {% endif %}
 
             {% if user.is_authenticated %}
-                <li>Usuario: {{ user.username }}</li>
-                <li>
-                    <form method="post" action="{% url 'logout' %}">
+                <li class="nav-item"><span class="nav-link">Usuario: {{ user.username }}</span></li>
+                <li class="nav-item">
+                    <form method="post" action="{% url 'logout' %}" class="d-flex">
                         {% csrf_token %}
-                        <button type="submit">Cerrar Sesión</button>
+                        <button type="submit" class="btn btn-link nav-link">Cerrar Sesión</button>
                     </form>
                 </li>
+                {%if user.is_staff %}
+                <li class="nav-item"><a class="nav-link" href="{% url 'admin:index' %}">Panel de Administración</a></li>
+                {% endif %}
             {% else %}
-                <li><a href="{% url 'login' %}">Iniciar Sesión</a></li>
-                <li><a href="{% url 'registro' %}">Registrarse</a></li>
+                <li class="nav-item"><a class="nav-link" href="{% url 'login' %}">Iniciar Sesión</a></li>
+                <li class="nav-item"><a class="nav-link" href="{% url 'registro' %}">Registrarse</a></li>
             {% endif %}
         </ul>
-    </nav>
+    </div>
+</nav>
     <main>
         {% block contenido %}
         {% endblock %}
