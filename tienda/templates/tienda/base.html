@@ -1,0 +1,37 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{% block title %}Tienda Virtual{% endblock %}</title>
+</head>
+<body>
+    <nav>
+        <ul>
+            <li><a href="{% url 'compra-list' %}">Tienda</a></li>
+            {% if user.is_staff %}
+                <li><a href="{% url 'producto-list' %}">Admin Productos</a></li>
+                <li><a href="{% url 'informes-menu' %}">Informes</a></li>
+            {% endif %}
+
+            {% if user.is_authenticated %}
+                <li>Usuario: {{ user.username }}</li>
+                <li>
+                    <form method="post" action="{% url 'logout' %}">
+                        {% csrf_token %}
+                        <button type="submit">Cerrar Sesión</button>
+                    </form>
+                </li>
+            {% else %}
+                <li><a href="{% url 'login' %}">Iniciar Sesión</a></li>
+                <li><a href="{% url 'registro' %}">Registrarse</a></li>
+            {% endif %}
+        </ul>
+    </nav>
+    <main>
+        {% block contenido %}
+        {% endblock %}
+    </main>
+</body>
+</html>
