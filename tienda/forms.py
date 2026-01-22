@@ -1,5 +1,5 @@
 from django import forms
-from .models import Producto
+from .models import Compra, Producto
 
 
 class ProductoForm(forms.ModelForm):
@@ -18,3 +18,19 @@ class ProductoForm(forms.ModelForm):
             if precio<0:
                 raise forms.ValidationError('El precio no puede ser negativo')
             return precio
+        
+
+class CompraForm(forms.ModelForm):
+    class Meta:
+        model = Compra
+        fields = ['unidades']
+        widgets = {
+            'unidades': forms.NumberInput(attrs={'class': 'form-control', 'min': '1', 'value': '1'}),
+        }
+    
+    
+    def clean_unidades(self):
+        unidades = self.cleaned_data['unidades']
+        if unidades < 1:
+            raise forms.ValidationError("Debes comprar al menos una unidad.")
+        return unidades

@@ -3,7 +3,12 @@ from django.urls import path, include
 from .views import *
 
 urlpatterns=[
+
+    path('tienda/',TiendaProducto.as_view(),name='tienda_productos'),
+    path('tienda/checkout/<int:pk>/',CheckoutProducto.as_view(),name='checkout'),
+
     path('tienda/admin/productos/listado',ListadoProductos.as_view(),name='listado'),
+    
     
     path('tienda/admin/productos/detalle/<int:pk>/',ProductoDetalle.as_view(),name='producto_detalle'),
     path('tienda/admin/productos/editar/<int:pk>/',EditarProducto.as_view(),name='producto_editar'),
