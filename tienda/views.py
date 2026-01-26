@@ -90,7 +90,7 @@ class CheckoutProducto(CreateView):
         compra.producto = producto
         compra.usuario = self.request.user
         compra.importe = producto.precio * unidades
-        compra.iva = compra.importe * 0.21
+        compra.iva = compra.importe * Decimal('0.21')
         
         producto.unidades -= unidades
         producto.save()

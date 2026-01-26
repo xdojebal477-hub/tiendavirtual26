@@ -46,7 +46,7 @@ class Compra(models.Model):
     unidades = models.PositiveIntegerField()
     fecha = models.DateTimeField(auto_now_add=True)
     importe = models.IntegerField()
-    iva = models.DecimalField(default=0.21, decimal_places=2, max_digits=2)
+    iva = models.DecimalField(default=0.21, decimal_places=2, max_digits=10)
 
     def __str__(self):
         return f'{self.usuario} - {self.fecha}'

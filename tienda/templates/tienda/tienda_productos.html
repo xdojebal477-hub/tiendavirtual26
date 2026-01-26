@@ -2,87 +2,83 @@
 
 {% block contenido %}
 <div class="container mt-4">
-    <div class="row">
-        <div class="col-md-3 mb-4">
-            <div class="card shadow-sm p-3">
-                <h4 class="mb-3 search">🔍 Filtros</h4>
-                <form method="get">
-                    <div class="mb-3">
-                        <label class="form-label">Buscar:</label>
-                        <input type="text" name="buscar" class="form-control" value="{{ request.GET.buscar|default:'' }}" placeholder="anillo...">
-                    </div>
-
-                    <div class="mb-3">
-                        <label class="form-label">Marca:</label>
-                        <select name="marca" class="form-select">
-                            <option value="">Todas las marcas</option>
-                            {% for marca in marcas %}
-                                <option value="{{ marca.id }}" {% if request.GET.marca|stringformat:"s" == marca.id|stringformat:"s" %}selected{% endif %}>
-                                    {{ marca.nombre }}
-                                </option>
-                            {% endfor %}
-                        </select>
-                    </div>
-
-                    <div class="d-grid gap-2">
-                        <button type="submit" class="btn btn-primary">Filtrar</button>
-                        <a href="{% url 'tienda_productos' %}" class="btn btn-outline-secondary">Limpiar</a>
-                    </div>
-                </form>
+    <!-- FILTROS -->
+    <div class="card p-3 mb-4 bg-light">
+        <form method="get" class="row g-3 align-items-center">
+            <div class="col-md-4">
+                <input type="text" name="buscar" class="form-control" placeholder="Buscar producto..." value="{{ request.GET.buscar }}">
             </div>
-        </div>
-
-        <div class="col-md-9">
-            <h2 class="mb-4">Catálogo</h2>
-            <div class="row row-cols-1 row-cols-md-2 row-cols-lg-3 g-4">
-                {% for producto in productos %}
-                    <div class="col">
-                        <div class="card h-100 shadow-sm border-0">
-                            <div class="bg-light d-flex align-items-center justify-content-center" style="height: 200px; overflow: hidden;">
-                                {% if producto.foto %}
-                                    <img src="{{ producto.foto.url }}" class="img-fluid" alt="{{ producto.nombre }}" style="max-height: 100%;">
-                                {% else %}
-                                    <span class="text-muted fs-1">📷</span>
-                                {% endif %}
-                            </div>
-
-                            <div class="card-body">
-                                <div class="d-flex justify-content-between align-items-start mb-2">
-                                    <h5 class="card-title fw-bold text-truncate" title="{{ producto.nombre }}">{{ producto.nombre }}</h5>
-                                    {% if producto.vip %}
-                                        <span class="badge bg-warning text-dark" title="Producto VIP">⭐</span>
-                                    {% endif %}
-                                </div>
-                                <p class="card-text text-muted small">{{ producto.marca.nombre }}</p>
-                                <h4 class="text-primary fw-bold">{{ producto.precio }} €</h4>
-                                
-                                <p class="small {% if producto.unidades > 0 %}text-success{% else %}text-danger{% endif %}">
-                                    {% if producto.unidades > 0 %}Stock: {{ producto.unidades }}{% else %}Agotado{% endif %}
-                                </p>
-                            </div>
-                            
-                            <div class="card-footer bg-white border-0 pb-3">
-                                <div class="d-grid">
-                                    {% if user.is_authenticated %}
-                                        {% if producto.unidades > 0 %}
-                                            <a href="{% url 'checkout' producto.pk %}" class="btn btn-primary">Comprar</a>
-                                        {% else %}
-                                            <button class="btn btn-secondary" disabled>Sin Stock</button>
-                                        {% endif %}
-                                    {% else %}
-                                        <a href="{% url 'login' %}?next={{ request.path }}" class="btn btn-outline-primary">Inicia sesión para comprar</a>
-                                    {% endif %}
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                {% empty %}
-                    <div class="col-12 text-center p-5">
-                        <p class="text-muted fs-4">No se encontraron productos con esos filtros.</p>
-                    </div>
-                {% endfor %}
+            <div class="col-md-4">
+                <select name="marca" class="form-select">
+                    <option value="">Todas las marcas</option>
+                    {% for marca in marcas %}
+                        <option value="{{ marca.id }}" {% if request.GET.marca|stringformat:"s" == marca.id|stringformat:"s" %}selected{% endif %}>
+                            {{ marca.nombre }}
+                        </option>
+                    {% endfor %}
+                </select>
             </div>
-        </div>
+            <div class="col-md-2">
+                <button type="submit" class="btn btn-primary w-100">Filtrar</button>
+            </div>
+            <div class="col-md-2">
+                 <a href="{% url 'tienda_productos' %}" class="btn btn-outline-secondary w-100">Limpiar</a>
+            </div>
+        </form>
+    </div>
+
+    <!-- LISTADO -->
+    <div class="row row-cols-1 row-cols-md-3 g-4">
+        {% for producto in productos %}
+            <div class="col">
+                <div class="card h-100 shadow-sm">
+                    <div class="card-header bg-transparent border-0 text-end">
+                        {% if producto.vip %}
+                            <span class="badge bg-warning text-dark">VIP</span>
+                        {% endif %}
+                    </div>
+                    
+                    <!-- Imagen -->
+                    <div class="text-center p-3" style="height: 200px;">
+                        {% if producto.foto %}
+                            <img src="{{ producto.foto.url }}" alt="{{ producto.nombre }}" style="max-height: 100%; max-width: 100%;">
+                        {% else %}
+                            <div class="text-muted h-100 d-flex align-items-center justify-content-center border rounded">
+                                Sin imagen
+                            </div>
+                        {% endif %}
+                    </div>
+
+                    <div class="card-body">
+                        <h5 class="card-title">{{ producto.nombre }}</h5>
+                        <p class="card-text text-muted small">{{ producto.marca.nombre }}</p>
+                        <h4 class="text-primary">{{ producto.precio }} €</h4>
+                        
+                        {% if producto.unidades > 0 %}
+                            <p class="text-success small">Stock: {{ producto.unidades }}</p>
+                        {% else %}
+                            <p class="text-danger small">Agotado</p>
+                        {% endif %}
+                    </div>
+                    
+                    <div class="card-footer bg-white border-0 pb-3">
+                        {% if user.is_authenticated %}
+                            {% if producto.unidades > 0 %}
+                                <a href="{% url 'checkout' producto.pk %}" class="btn btn-success w-100">Comprar Ahora</a>
+                            {% else %}
+                                <button class="btn btn-secondary w-100" disabled>Sin Stock</button>
+                            {% endif %}
+                        {% else %}
+                            <a href="{% url 'login' %}?next={{ request.path }}" class="btn btn-outline-primary w-100">Loguéate para comprar</a>
+                        {% endif %}
+                    </div>
+                </div>
+            </div>
+        {% empty %}
+            <div class="col-12">
+                <p class="alert alert-warning">No se encontraron productos.</p>
+            </div>
+        {% endfor %}
     </div>
 </div>
 {% endblock %}
