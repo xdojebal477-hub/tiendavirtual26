@@ -15,4 +15,8 @@ urlpatterns=[
     path('tienda/admin/productos/eliminar/<int:pk>/',EliminarProducto.as_view(),name='producto_eliminar'),
     path('tienda/admin/productos/nuevo/',NuevoProducto.as_view(),name='producto_nuevo'),
     
+
+
+    path('perfil/',PerfilDetalle.as_view(),name='perfil_detalle'),
+    path('tienda/informes/',InformeVentas.as_view(),name='informe_ventas'),
 ]

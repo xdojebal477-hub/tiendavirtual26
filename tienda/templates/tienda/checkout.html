@@ -30,7 +30,7 @@
                     <form method="post">
                         {% csrf_token %}
                         
-                        <!-- Si hay errores generales (ej: stock insuficiente) -->
+                        <!-- Si hay errores generales -->
                         {% if form.non_field_errors %}
                             <div class="alert alert-danger">{{ form.non_field_errors }}</div>
                         {% endif %}
@@ -51,8 +51,7 @@
                                 <span>Usuario:</span>
                                 <span>{{ user.username }}</span>
                             </div>
-                            <!-- Aquí podríamos añadir JS para calcular el total dinámicamente si quisieras -->
-                        </div>
+                            
 
                         <div class="d-grid gap-2">
                             <button type="submit" class="btn btn-success btn-lg">Pagar y Confirmar</button>

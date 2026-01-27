@@ -1,6 +1,6 @@
 from django.shortcuts import render,redirect,get_object_or_404
 from .models import *
-from django.views.generic import View, ListView, DetailView, CreateView, UpdateView,DeleteView
+from django.views.generic import View, ListView, DetailView, CreateView, UpdateView, DeleteView, TemplateView
 from django.urls import reverse_lazy
 from .forms import ProductoForm,CompraForm
 from decimal import Decimal, InvalidOperation
@@ -44,12 +44,12 @@ class TiendaProducto(ListView):
         queryset = super().get_queryset().select_related('marca')
 
         # filtros (el template usa "buscar"; aceptamos también "nombre" por compatibilidad)
-        buscar = (self.request.GET.get('buscar') or self.request.GET.get('nombre') or '').strip()
+        nombre = (self.request.GET.get('buscar') or self.request.GET.get('nombre') or '').strip()
         marca_id = (self.request.GET.get('marca') or '').strip()
         
 
-        if buscar:
-            queryset = queryset.filter(nombre__icontains=buscar)
+        if nombre:
+            queryset = queryset.filter(nombre__icontains=nombre)
 
         if marca_id:
             # evita filtros raros si viene algo no numérico
@@ -103,3 +103,67 @@ class CheckoutProducto(CreateView):
         usuario.save()
         
         return super().form_valid(form)
+    
+class CheckoutProducto(View):
+    def get(self, request, pk):
+        producto = get_object_or_404(Producto, pk=pk)
+        form = CompraForm()
+        return render(request, 'tienda/checkout.html', {'form': form, 'producto': producto})
+
+    def post(self, request, pk):
+        producto = get_object_or_404(Producto, pk=pk)
+        form = CompraForm(request.POST)
+
+        if form.is_valid():
+            unidades = form.cleaned_data['unidades']
+
+            if producto.unidades < unidades:
+                form.add_error('unidades', 'No hay suficientes unidades disponibles.')
+                return render(request, 'tienda/checkout.html', {'form': form, 'producto': producto})
+
+            compra = form.save(commit=False)
+            compra.producto = producto
+            compra.usuario = request.user
+            compra.importe = producto.precio * unidades
+            compra.iva = compra.importe * Decimal('0.21')
+
+            producto.unidades -= unidades
+            producto.save()
+
+            compra.save()
+
+            # Actualizar saldo del usuario
+            usuario = request.user
+            usuario.saldo -= compra.importe + compra.iva
+            usuario.save()
+
+            return redirect('tienda_productos')
+
+        return render(request, 'tienda/checkout.html', {'form': form, 'producto': producto})
+    
+
+
+
+# class PerfilDetalle(DetailView):
+#     model=Usuario
+#     template_name='tienda/perfil_detalle.html'
+#     context_object_name='usuario'
+
+#     def get_object(self):
+#         return get_object_or_404(Usuario, pk=self.request.user.pk)
+
+
+class PerfilDetalle(TemplateView):
+    template_name = 'tienda/perfil_detalle.html'
+
+    def get_context_data(self, **kwargs):
+        contexto=super().get_context_data(**kwargs)
+        contexto['compras']=Compra.objects.filter(usuario=self.request.user)
+        return contexto
+    
+
+class InformeVentas(TemplateView):#utilizamos annotate 
+    template_name='tienda/informe_ventas.html'
+
+    pass
+        
